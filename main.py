@@ -4,9 +4,6 @@ from datetime import datetime
 import torch
 import torchaudio
 from nemo.collections.asr.models.msdd_models import NeuralDiarizer
-from deepmultilingualpunctuation import PunctuationModel
-import re
-import logging
 import faster_whisper
 from ctc_forced_aligner import (
     load_alignment_model,
@@ -17,7 +14,7 @@ from ctc_forced_aligner import (
     postprocess_results,
 )
 
-from helper_funcs import langs_to_iso, create_config, punct_model_langs, \
+from helper_funcs import langs_to_iso, create_config,\
     get_words_speaker_mapping, get_realigned_ws_mapping_with_punctuation, get_sentences_speaker_mapping, \
     get_speaker_aware_transcript, write_srt, cleanup
 from services.model_manager.whisper_manager import preload_models
@@ -51,8 +48,8 @@ emissions, stride = generate_emissions(
     alignment_model, audio_waveform, batch_size=batch_size
 )
 
-del alignment_model
-torch.cuda.empty_cache()
+# del alignment_model
+# torch.cuda.empty_cache()
 
 tokens_starred, text_starred = preprocess_text(
     full_transcript,
@@ -107,39 +104,9 @@ with open(os.path.join(temp_path, "pred_rttms", "mono_file.rttm"), "r") as f:
         e = s + int(float(line_list[8]) * 1000)
         speaker_ts.append([s, e, int(line_list[11].split("_")[-1])])
 
+print("SPEAKER_TS", speaker_ts)
+
 wsm = get_words_speaker_mapping(word_timestamps, speaker_ts, "start")
-
-
-if info.language in punct_model_langs:
-    # restoring punctuation in the transcript to help realign the sentences
-    punct_model = PunctuationModel(model="kredor/punctuate-all")
-
-    words_list = list(map(lambda x: x["word"], wsm))
-
-    labled_words = punct_model.predict(words_list, chunk_size=230)
-
-    ending_puncts = ".?!"
-    model_puncts = ".,;:!?"
-
-    # We don't want to punctuate U.S.A. with a period. Right?
-    is_acronym = lambda x: re.fullmatch(r"\b(?:[a-zA-Z]\.){2,}", x)
-
-    for word_dict, labeled_tuple in zip(wsm, labled_words):
-        word = word_dict["word"]
-        if (
-            word
-            and labeled_tuple[1] in ending_puncts
-            and (word[-1] not in model_puncts or is_acronym(word))
-        ):
-            word += labeled_tuple[1]
-            if word.endswith(".."):
-                word = word.rstrip(".")
-            word_dict["word"] = word
-
-else:
-    logging.warning(
-        f"Punctuation restoration is not available for {info.language} language. Using the original punctuation."
-    )
 
 wsm = get_realigned_ws_mapping_with_punctuation(wsm)
 ssm = get_sentences_speaker_mapping(wsm, speaker_ts)

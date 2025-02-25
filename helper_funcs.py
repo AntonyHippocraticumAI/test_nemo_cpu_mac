@@ -4,23 +4,7 @@ import os
 import shutil
 
 import nltk
-import wget
 from omegaconf import OmegaConf
-
-punct_model_langs = [
-    "en",
-    "fr",
-    "de",
-    "es",
-    "it",
-    "nl",
-    "pt",
-    "bg",
-    "pl",
-    "cs",
-    "sk",
-    "sl",
-]
 
 LANGUAGES = {
     "en": "english",
@@ -253,10 +237,7 @@ whisper_langs = sorted(LANGUAGES.keys()) + sorted(
 def create_config(output_dir):
     DOMAIN_TYPE = "telephonic"  # Can be meeting, telephonic, or general based on domain type of the audio file
     CONFIG_FILE_NAME = f"diar_infer_{DOMAIN_TYPE}.yaml"
-    CONFIG_URL = f"https://raw.githubusercontent.com/NVIDIA/NeMo/main/examples/speaker_tasks/diarization/conf/inference/{CONFIG_FILE_NAME}"
-    MODEL_CONFIG = os.path.join(output_dir, CONFIG_FILE_NAME)
-    if not os.path.exists(MODEL_CONFIG):
-        MODEL_CONFIG = wget.download(CONFIG_URL, output_dir)
+    MODEL_CONFIG = f"NeMo/examples/speaker_tasks/diarization/conf/inference/{CONFIG_FILE_NAME}"
 
     config = OmegaConf.load(MODEL_CONFIG)
 
@@ -276,27 +257,9 @@ def create_config(output_dir):
         json.dump(meta, fp)
         fp.write("\n")
 
-    pretrained_vad = "vad_multilingual_marblenet"
-    pretrained_speaker_model = "titanet_large"
-    config.num_workers = 0  # Workaround for multiprocessing hanging with ipython issue
     config.diarizer.manifest_filepath = os.path.join(data_dir, "input_manifest.json")
     config.diarizer.out_dir = (
         output_dir  # Directory to store intermediate files and prediction outputs
-    )
-
-    config.diarizer.speaker_embeddings.model_path = pretrained_speaker_model
-    config.diarizer.oracle_vad = (
-        False  # compute VAD provided with model_path to vad config
-    )
-    config.diarizer.clustering.parameters.oracle_num_speakers = False
-
-    # Here, we use our in-house pretrained NeMo VAD model
-    config.diarizer.vad.model_path = pretrained_vad
-    config.diarizer.vad.parameters.onset = 0.8
-    config.diarizer.vad.parameters.offset = 0.6
-    config.diarizer.vad.parameters.pad_offset = -0.05
-    config.diarizer.msdd_model.model_path = (
-        "diar_msdd_telephonic"  # Telephonic speaker diarization model
     )
 
     return config

@@ -4,7 +4,7 @@ import torch
 audio_path = "/Users/antonandreev/python_prog/test_nemo_cpu_mac/audio_samples/recording_16000hz.wav"
 
 # Whether to enable music removal from speech, helps increase diarization quality but uses alot of ram
-enable_stemming = True
+enable_stemming = False
 
 # (choose from 'tiny.en', 'tiny', 'base.en', 'base', 'small.en', 'small', 'medium.en', 'medium', 'large-v1', 'large-v2', 'large-v3', 'large')
 whisper_model_name = "large-v3"
