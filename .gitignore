@@ -116,4 +116,5 @@ tests/data
 .secrets
 .idea/
 voice_activity_plots/
-.NeMo/
+.temp_outputs/
+temp_outputs/
