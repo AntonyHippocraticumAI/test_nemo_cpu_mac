@@ -17,74 +17,22 @@ from ctc_forced_aligner import (
     postprocess_results,
 )
 
-from helper_funcs import find_numeral_symbol_tokens, langs_to_iso, create_config, punct_model_langs, \
+from helper_funcs import langs_to_iso, create_config, punct_model_langs, \
     get_words_speaker_mapping, get_realigned_ws_mapping_with_punctuation, get_sentences_speaker_mapping, \
     get_speaker_aware_transcript, write_srt, cleanup
-from settings import enable_stemming, audio_path, device, whisper_model_name, suppress_numerals, batch_size, language
+from services.model_manager.whisper_manager import preload_models
+from settings import enable_stemming, audio_path, device, batch_size
+from utils.stemming import extract_vocals
 
 #-----------------------------------------------------------------------------------------------------------------------
 
-if enable_stemming:
-    # Isolate vocals from the rest of the audio
-
-    return_code = os.system(
-        f'python -m demucs.separate -n htdemucs --two-stems=vocals "{audio_path}" -o "temp_outputs" --device "{device}"'
-    )
-
-    if return_code != 0:
-        logging.warning("Source splitting failed, using original audio file.")
-        vocal_target = audio_path
-    else:
-        vocal_target = os.path.join(
-            "temp_outputs",
-            "htdemucs",
-            os.path.splitext(os.path.basename(audio_path))[0],
-            "vocals.wav",
-        )
-else:
-    vocal_target = audio_path
-
-#-----------------------------------------------------------------------------------------------------------------------
-
-compute_type = "int8"
-# or run on GPU with INT8
-# compute_type = "int8_float16"
-# or run on CPU with INT8
-# compute_type = "int8"
-
-whisper_model = faster_whisper.WhisperModel(
-    whisper_model_name, device=device, compute_type=compute_type
-)
-whisper_pipeline = faster_whisper.BatchedInferencePipeline(whisper_model)
+vocal_target = extract_vocals(audio_path, enable_stemming=enable_stemming, device=device)
 audio_waveform = faster_whisper.decode_audio(vocal_target)
-suppress_tokens = (
-    find_numeral_symbol_tokens(whisper_model.hf_tokenizer)
-    if suppress_numerals
-    else [-1]
-)
 
-if batch_size > 0:
-    transcript_segments, info = whisper_pipeline.transcribe(
-        audio_waveform,
-        language,
-        suppress_tokens=suppress_tokens,
-        batch_size=batch_size,
-        without_timestamps=True,
-    )
-else:
-    transcript_segments, info = whisper_model.transcribe(
-        audio_waveform,
-        language,
-        suppress_tokens=suppress_tokens,
-        without_timestamps=True,
-        vad_filter=True,
-    )
+#-----------------------------------------------------------------------------------------------------------------------
 
-full_transcript = "".join(segment.text for segment in transcript_segments)
-print(full_transcript)
-# clear gpu vram
-del whisper_model, whisper_pipeline
-torch.cuda.empty_cache()
+whisper_model_manager = preload_models()
+full_transcript, info = whisper_model_manager.transcribe_file(audio_waveform=audio_waveform)
 
 #-----------------------------------------------------------------------------------------------------------------------
 
