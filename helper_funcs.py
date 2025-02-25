@@ -235,9 +235,7 @@ whisper_langs = sorted(LANGUAGES.keys()) + sorted(
 # https://raw.githubusercontent.com/NVIDIA/NeMo/main/examples/speaker_tasks/diarization/conf/inference/diar_infer_telephonic.yaml
 
 def create_config(output_dir):
-    DOMAIN_TYPE = "telephonic"  # Can be meeting, telephonic, or general based on domain type of the audio file
-    CONFIG_FILE_NAME = f"diar_infer_{DOMAIN_TYPE}.yaml"
-    MODEL_CONFIG = f"NeMo/examples/speaker_tasks/diarization/conf/inference/{CONFIG_FILE_NAME}"
+    MODEL_CONFIG = "utils/NeMo/diar_infer_telephonic.yaml"
 
     config = OmegaConf.load(MODEL_CONFIG)
 
