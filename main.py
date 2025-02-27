@@ -48,9 +48,6 @@ emissions, stride = generate_emissions(
     alignment_model, audio_waveform, batch_size=batch_size
 )
 
-# del alignment_model
-# torch.cuda.empty_cache()
-
 tokens_starred, text_starred = preprocess_text(
     full_transcript,
     romanize=True,
@@ -88,9 +85,6 @@ torchaudio.save(
 # Initialize NeMo MSDD diarization model
 msdd_model = NeuralDiarizer(cfg=create_config(temp_path))
 msdd_model.diarize()
-
-# del msdd_model
-# torch.cuda.empty_cache()
 
 #-----------------------------------------------------------------------------------------------------------------------
 # Reading timestamps <> Speaker Labels mapping

@@ -25,3 +25,5 @@ language = None  # autodetect language
 
 device = "cuda" if torch.cuda.is_available() else "cpu"
 print(device)
+
+vad_model_path = "/Users/antonandreev/python_prog/test_nemo_cpu_mac/nemo_vad_models/vad_marblenet.nemo"
