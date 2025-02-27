@@ -20,6 +20,7 @@ import json
 import os
 
 import torch
+import torch.multiprocessing as mp
 
 from nemo.collections.asr.parts.utils.speaker_utils import write_rttm2manifest
 from nemo.collections.asr.parts.utils.vad_utils import (
@@ -68,10 +69,12 @@ def main(cfg):
             "If you encounter CUDA memory issue, try splitting manifest entry by split_duration to avoid it."
         )
 
-    torch.set_grad_enabled(False)
+    # torch.set_grad_enabled(False) CUDA
+
     vad_model = init_vad_model(cfg.vad.model_path)
 
     # setup_test_data
+    print("Starting setup vad...")
     vad_model.setup_test_data(
         test_data_config={
             'vad_stream': True,
@@ -86,9 +89,11 @@ def main(cfg):
             'normalize_audio': cfg.vad.parameters.normalize_audio,
         }
     )
+    print("End setup vad...")
 
     vad_model = vad_model.to(device)
     vad_model.eval()
+    print("Set the module in evaluation mode")
 
     if not os.path.exists(cfg.frame_out_dir):
         os.mkdir(cfg.frame_out_dir)
@@ -156,5 +161,7 @@ def main(cfg):
         logging.info(f"Writing VAD output to manifest: {out_manifest_filepath}")
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
+    mp.set_start_method("spawn", force=True)  # Важливо для MacOS
+
     main()
