@@ -5,7 +5,7 @@ import faster_whisper
 from faster_whisper import WhisperModel
 
 from helper_funcs import find_numeral_symbol_tokens
-from settings import suppress_numerals, whisper_model_name, device, compute_type, batch_size, beams_size
+from utils.settings import suppress_numerals, whisper_model_name, device, compute_type, batch_size, beams_size
 
 
 class WhisperModelManager:
@@ -35,6 +35,41 @@ class WhisperModelManager:
         return self.load_model(model_name)
 
 
+    def transcribe_with_vad(self, audio_waveform, model_name: str = whisper_model_name, batch_flag: bool = False):
+        whisper_model = self.get_model(model_name)
+
+        if batch_flag:
+
+            whisper_pipeline = faster_whisper.BatchedInferencePipeline(whisper_model)
+
+            try:
+                transcript_segments, info = whisper_pipeline.transcribe(
+                    audio_waveform,
+                    batch_size=self.batch_size,
+                    without_timestamps=True,
+                )
+
+                full_transcript = "".join(segment.text for segment in transcript_segments)
+
+                return full_transcript, info
+            except Exception as e:
+                raise e
+
+        try:
+            transcript_segments, info = whisper_model.transcribe(audio_waveform, beam_size=5)
+
+            final_text = []
+            for segment in transcript_segments:
+                final_text.append(segment.text)
+                print(segment.text)
+        except Exception as e:
+            raise e
+
+        full_transcript = "".join(segment for segment in final_text)
+
+        return full_transcript, final_text
+
+
     def transcribe_file(self, audio_waveform, model_name: str = whisper_model_name):
         whisper_model = self.get_model(model_name)
 
@@ -61,7 +96,6 @@ class WhisperModelManager:
         print(full_transcript)
 
         return full_transcript, info
-
 
 @lru_cache
 def get_model_manager() -> WhisperModelManager:

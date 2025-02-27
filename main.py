@@ -18,7 +18,7 @@ from helper_funcs import langs_to_iso, create_config,\
     get_words_speaker_mapping, get_realigned_ws_mapping_with_punctuation, get_sentences_speaker_mapping, \
     get_speaker_aware_transcript, write_srt, cleanup
 from services.model_manager.whisper_manager import preload_models
-from settings import enable_stemming, audio_path, device, batch_size
+from utils.settings import enable_stemming, audio_path, device, batch_size
 from utils.stemming import extract_vocals
 
 #-----------------------------------------------------------------------------------------------------------------------
