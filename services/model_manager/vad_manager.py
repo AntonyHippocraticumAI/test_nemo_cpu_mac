@@ -132,6 +132,8 @@ class NemoVADModelManager:
             start_i = int(start_sec * sr)
             end_i = int(end_sec * sr)
             chunks.append(audio[start_i:end_i])
+
+
         if chunks:
             cleaned_audio = np.concatenate(chunks)
         else:
