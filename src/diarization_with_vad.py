@@ -23,7 +23,7 @@ AUDIO_PATH = "/Users/antonandreev/python_prog/test_nemo_cpu_mac/audio_samples/re
 WHISPER_MODEL_NAME = "large-v3"  # "large-v2", "medium", і т.п.
 FORCE_SPEAKERS = None  # Спробуйте: None, або 2, або 3...
 DISTANCE_THRESHOLD = 0.7  # Якщо FORCE_SPEAKERS=None, алгоритм візьме цей поріг
-VAD_MODEL_PATH = "/Users/antonandreev/python_prog/test_nemo_cpu_mac/nemo_vad_models/vad_marblenet.nemo"  # Або інший
+VAD_MODEL_PATH = "/Users/antonandreev/python_prog/test_nemo_cpu_mac/vad/vad_marblenet.nemo"  # Або інший
 SPEAKER_MODEL_PATH = "/Users/antonandreev/speakerverification_speakernet_v1.6.0/speakerverification_speakernet.nemo"               # Titanet model
 ##############################################################################
 

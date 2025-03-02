@@ -1,9 +1,6 @@
-import faster_whisper
-import numpy as np
-
-from services.model_manager.vad_manager import preload_vad_model
-from services.model_manager.whisper_manager import preload_models
-from utils.settings import audio_path
+from src.services.model_manager.vad_manager import preload_vad_model
+from src.services.model_manager.whisper_manager import preload_models
+from src.utils.settings import AUDIO_PATH
 
 #-----------------------------------------------------------------------------------------------------------------------
 
@@ -13,7 +10,7 @@ print("Loaded VAD and WHISPER models")
 
 #-----------------------------------------------------------------------------------------------------------------------
 
-audio, sr = vad_model_manager.get_audio_time_series(audio_path)
+audio, sr = vad_model_manager.get_audio_time_series(AUDIO_PATH)
 print("audio", audio)
 
 segments = vad_model_manager.get_speech_segments(audio, sr)
