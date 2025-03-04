@@ -1,7 +1,8 @@
 import torch
 
 # Name of the audio file
-AUDIO_PATH = "/Users/antonandreev/python_prog/test_nemo_cpu_mac/audio_samples/recording_16000hz.wav"
+# AUDIO_PATH = "/Users/antonandreev/python_prog/test_nemo_cpu_mac/audio_samples/recording_16000hz.wav"
+AUDIO_PATH = "/Users/antonandreev/python_prog/test_nemo_cpu_mac/audio_samples/ravi_inva.wav"
 
 # Whether to enable music removal from speech, helps increase diarization quality but uses alot of ram
 enable_stemming = True
@@ -27,5 +28,5 @@ device = "cuda" if torch.cuda.is_available() else "cpu"
 print(device)
 
 WHISPER_MODEL_NAME = "large-v3"
-VAD_MODEL_PATH = "/Users/antonandreev/python_prog/test_nemo_cpu_mac/vad/vad_marblenet.nemo"   # або локальний .nemo файл
+VAD_MODEL_PATH = "/Users/antonandreev/python_prog/test_nemo_cpu_mac/nemo_models/vad/vad_marblenet.nemo"   # або локальний .nemo файл
 EMBED_MODEL_PATH = "/Users/antonandreev/titanet_large_vv1/titanet-l.nemo"

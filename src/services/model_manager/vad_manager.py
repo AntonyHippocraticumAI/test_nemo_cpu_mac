@@ -6,16 +6,16 @@ import torch
 import numpy as np
 from nemo.collections.asr.models import EncDecClassificationModel
 
-from utils.settings import vad_model_path, device
+from src.utils.settings import VAD_MODEL_PATH, device
 
 
 class NemoVADModelManager:
     def __init__(self):
         """
-        :param vad_model_path: шлях до вашого VAD .nemo-файлу
+        :param vad_model_path: шлях до VAD .nemo-файлу
         :param device: "cpu" або "cuda" (якщо є GPU)
         """
-        self.vad_model_path = vad_model_path
+        self.vad_model_path = VAD_MODEL_PATH
         self.device = device
 
         self._lock = threading.Lock()
@@ -48,6 +48,30 @@ class NemoVADModelManager:
 
     def get_audio_time_series(self, input_audio_path: str, sr=16000):
         return librosa.load(input_audio_path, sr=sr)
+
+
+    def get_params_for_vad_model(self,
+                                 audio_waveform: np.ndarray,
+                                 sr: int = 16000,
+                                 window_length: float = 0.63,
+                                 shift_length: float = 0.08,
+                                 onset_thresh: float = 0.5,
+                                 offset_thresh: float = 0.3,
+                                 pad_onset: float = 0.2,
+                                 pad_offset: float = 0.2,
+                                 min_speech_dur: float = 0.5
+    ):
+        return {
+            "audio_waveform": audio_waveform,
+            "sr": sr,
+            "window_length": window_length,
+            "shift_length": shift_length,
+            "onset_thresh": onset_thresh,
+            "offset_thresh": offset_thresh,
+            "pad_onset": pad_onset,
+            "pad_offset": pad_offset,
+            "min_speech_dur": min_speech_dur,
+        }
 
 
     def get_speech_segments(self,

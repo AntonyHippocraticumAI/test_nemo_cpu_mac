@@ -22,17 +22,17 @@ def create_config_diarisation(MANIFEST_PATH, OUT_DIR):
                 "model_path": "/Users/antonandreev/python_prog/test_nemo_cpu_mac/nemo_models/vad/vad_marblenet.nemo",
                 'external_vad_manifest': None,
                 "parameters": {
-                    "window_length_in_sec": 0.15,
+                    "window_length_in_sec": 0.15,  # Window length in sec for VAD context input
+                    "shift_length_in_sec": 0.01,  # Shift length in sec for generate frame level VAD prediction
                     "smoothing": "median",  # False or type of smoothing method (eg: median)
-                    "overlap": 0.5,  # Overlap ratio for overlapped mean/median smoothing filter
-                    "onset": 0.8,  # Onset threshold for detecting the beginning and end of a speech
-                    "offset": 0.6,  # Offset threshold for detecting the end of a speech
-                    "pad_onset": 0.1,  # Adding durations before each speech segment
-                    "pad_offset": -0.05,  # Adding durations after each speech segment
-                    "min_duration_on": 0,  # Threshold for small non_speech deletion
+                    "overlap": 0.875,  # Overlap ratio for overlapped mean/median smoothing filter
+                    "onset": 0.4,  # Onset threshold for detecting the beginning and end of a speech
+                    "offset": 0.7,  # Offset threshold for detecting the end of a speech
+                    "pad_onset": 0.05,  # Adding durations before each speech segment
+                    "pad_offset": -0.1,  # Adding durations after each speech segment
+                    "min_duration_on": 0.2,  # Threshold for small non_speech deletion
                     "min_duration_off": 0.2,  # Threshold for short speech segment deletion
-                    "filter_speech_first": True,
-                    "shift_length_in_sec": 0.01,
+                    "filter_speech_first": True
                 }
             },
             "speaker_embeddings": {
@@ -60,7 +60,7 @@ def create_config_diarisation(MANIFEST_PATH, OUT_DIR):
                 "oracle_num_speakers": False,
                 "parameters": {
                     "oracle_num_speakers": False,  # If True, use num of speakers value provided in manifest file.
-                    "max_num_speakers": 8,
+                    "max_num_speakers": 20,
                     # Max number of speakers for each recording. If an oracle number of speakers is passed, this value is ignored.
                     "enhanced_count_thres": 80,
                     # If the number of segments is lower than this number, enhanced speaker counting is activated.

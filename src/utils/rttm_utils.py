@@ -46,30 +46,34 @@ class RttmUtils:
         return diar_segments
 
 
+    def assign_speaker_to_whisper_segment(self, wseg, diar_segments):
+        """
+        Для даного whisper-сегмента знаходить діар-сегмент, який має найбільше перекриття,
+        і повертає відповідну мітку спікера.
+        """
+        w_start, w_end = wseg["start"], wseg["end"]
+        max_overlap = 0
+        assigned_speaker = None
+        for d in diar_segments:
+            d_start, d_end = d["start"], d["end"]
+            # Обчислюємо перекриття
+            overlap = max(0, min(w_end, d_end) - max(w_start, d_start))
+            if overlap > max_overlap:
+                max_overlap = overlap
+                assigned_speaker = d["speaker"]
+        return assigned_speaker
+
+
     def merging_diarization_with_wshiper_segments(self, diar_segments, whisper_segments):
         final_merged = []
-        i, j = 0, 0
-        while i < len(whisper_segments) and j < len(diar_segments):
-            w = whisper_segments[i]
-            d = diar_segments[j]
-
-            overlap_start = max(w["start"], d["start"])
-            overlap_end = min(w["end"], d["end"])
-
-            if overlap_end > overlap_start:
-                # Створюємо "перетин", додаємо окремим куском
-                final_merged.append({
-                    "start": overlap_start,
-                    "end": overlap_end,
-                    "speaker": d["speaker"],
-                    "text": w["text"]
-                })
-
-            # рухаємося вперед у тому масиві, де "end" менше
-            if w["end"] < d["end"]:
-                i += 1
-            else:
-                j += 1
+        for w in whisper_segments:
+            spk = self.assign_speaker_to_whisper_segment(w, diar_segments)
+            final_merged.append({
+                "start": w["start"],
+                "end": w["end"],
+                "speaker": spk if spk is not None else "UNK",
+                "text": w["text"]
+            })
         return final_merged
 
 

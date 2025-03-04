@@ -82,10 +82,9 @@ class WhisperModelManager:
         whisper_pipeline = faster_whisper.BatchedInferencePipeline(whisper_model)
 
         try:
-            transcript_segments, info = whisper_pipeline.transcribe(
+            transcript_segments, info = whisper_model.transcribe(
                 audio_waveform,
-                batch_size=32,
-                beam_size=1,
+                beam_size=8,
                 without_timestamps=False,
             )
         except Exception as e:
