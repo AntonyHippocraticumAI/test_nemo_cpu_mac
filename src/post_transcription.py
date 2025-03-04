@@ -34,8 +34,7 @@ logger.info(f"FINAL TRANSCRIPT: {full_transcript}")
 
 
 PROJECT_ROOT = os.path.abspath(os.path.join(os.path.dirname(__file__), '..'))
-RESULT_DIR = os.path.join(PROJECT_ROOT, "results", "post_transcription/")
-# RESULT_DIR = "results/post_transcription/"
+RESULT_DIR = os.path.join(PROJECT_ROOT, "results", "segmentations_and_transcriptions/")
 RESULT_FILE_NAME = generate_readable_filename(RESULT_DIR)
 os.makedirs(os.path.dirname(RESULT_FILE_NAME), exist_ok=True)
 

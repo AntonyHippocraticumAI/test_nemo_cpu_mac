@@ -3,6 +3,7 @@ import librosa
 from nemo.collections.asr.models import NeuralDiarizer
 
 from services.model_manager.whisper_manager import preload_models
+from src.utils.d_utils import DiarizationService
 from src.utils.manifest import create_manifest
 from src.utils.config_models import create_config_diarisation
 from src.utils.rttm_utils import RttmUtils
@@ -65,14 +66,24 @@ def main():
 
     # Merging diar_segments with whisper_segments
     # Each Whisper segment (wseg) can overlap with several diar segments.
-    final_merged = rttm_utils.merging_diarization_with_wshiper_segments(diar_segments, whisper_segments)
+
+    methods = [DiarizationService.probabilistic_speaker_matching]
+
+    matched_segments = DiarizationService.ensemble_speaker_matching(
+        whisper_segments,
+        diar_segments,
+        methods=methods,
+    )
+
+    final_merged = DiarizationService.merge_adjacent_segments(matched_segments)
 
     ##########################################################################
     # D) Final merge
     ##########################################################################
+
+    DiarizationService.export_results(final_merged, methods)
     logger.info("\n=== FINAL MERGED (WHISPER + MSDD DIARIZATION) ===")
 
-    rttm_utils.create_result(final_merged)
 
 if __name__ == "__main__":
     main()

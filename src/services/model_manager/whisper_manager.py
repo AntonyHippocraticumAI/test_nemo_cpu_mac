@@ -84,7 +84,8 @@ class WhisperModelManager:
         try:
             transcript_segments, info = whisper_model.transcribe(
                 audio_waveform,
-                beam_size=8,
+                # batch_size=self.batch_size,
+                beam_size=self.beams_size,
                 without_timestamps=False,
             )
         except Exception as e:
@@ -102,6 +103,7 @@ class WhisperModelManager:
                 "text": seg.text.strip().replace("\n", " "),
             })
         return whisper_segments
+
 
 @lru_cache
 def get_model_manager() -> WhisperModelManager:
